@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Professional Unique ID Generator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+  /* Reset and base */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  button {
+    cursor: pointer;
+    background-color: #4a7cf7;
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding: 0.65rem 1.1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  button:hover {
+    background-color: #3b66d1;
+  }
+  button:disabled {
+    background-color: #9bb7f5;
+    cursor: not-allowed;
+  }
+  input, select {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    padding: 0.55rem 0.8rem;
+    border: 1.8px solid #ddd;
+    border-radius: 6px;
+    width: 100%;
+    transition: border-color 0.25s ease;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: #4a7cf7;
+  }
+  label {
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 0.3rem;
+    display: block;
+  }
+  h1 {
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    letter-spacing: 1.8px;
+    color: #2a2a2a;
+  }
+  h2 {
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    letter-spacing: 1.6px;
+    color: #2a2a2a;
+  }
+  small {
+    font-style: italic;
+    font-size: 0.8rem;
+    margin-top: -1rem;
+    margin-bottom: 1rem;
+    display: block;
+    text-align: right;
+    color: #888;
+  }
+  .container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 16px 32px rgba(0,0,0,0.1);
+    width: 420px;
+    max-width: 95vw;
+    padding: 30px 30px 40px 30px;
+  }
+  .result {
+    background: #e7f0ff;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-top: 1.5rem;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: #1a3dbf;
+    letter-spacing: 2px;
+    user-select: all;
+    text-align: center;
+  }
+  .pdf-btn {
+    background-color: #22a65b;
+    width: 100%;
+    margin-top: 1rem;
+  }
+  .pdf-btn:hover {
+    background-color: #1d894a;
+  }
+  .admin-login-btn {
+    background-color: transparent;
+    color: #4a7cf7;
+    border: 2px solid #4a7cf7;
+    font-weight: 700;
+    margin-top: 20px;
+    width: 100%;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  .admin-login-btn:hover {
+    background-color: #4a7cf7;
+    color: white;
+  }
+  #toast {
+    visibility: hidden;
+    min-width: 280px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 14px 24px;
+    position: fixed;
+    z-index: 9999;
+    left: 50%;
+    bottom: 30px;
+    font-size: 14px;
+    opacity: 0;
+    user-select: none;
+    transform: translateX(-50%);
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  #toast.show {
+    visibility: visible;
+    opacity: 1;
+  }
+  /* Hide the containers initially (only show relevant) */
+  #generator-container, #admin-container {
+    display: none;
+  }
+  /* Visible container */
+  #generator-container.active, #admin-container.active {
+    display: block;
+  }
+  /* Admin container */
+  #admin-container h2 {
+    color: #33475b;
+  }
+  #admin-container form {
+    max-width: 320px;
+    margin: 0 auto 25px auto;
+  }
+  #admin-container form > div {
+    margin-bottom: 15px;
+  }
+  #admin-container .error-message {
+    color: #d9534f;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+  /* Admin table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  table thead {
+    background: #4a7cf7;
+    color: white;
+  }
+  table thead th {
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  table tbody tr:nth-child(even) {
+    background: #f0f4ff;
+  }
+  table tbody td {
+    padding: 9px 12px;
+    font-size: 0.9rem;
+    color: #333;
+    word-break: break-word;
+  }
+  .admin-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .btn-logout {
+    background-color: #d9534f;
+    padding: 0.45rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    font-weight: 700;
+    border: none;
+  }
+  .btn-logout:hover {
+    background-color: #c0392b;
+  }
+  /* Scroll table if overflow */
+  .table-wrapper {
+    max-height: 290px;
+    overflow-y: auto;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+  }
+</style>
+
+<!-- jsPDF CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- EmailJS SDK CDN -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
+
+</head>
+<body>
+
+<div class="container" id="generator-container" role="main" aria-label="Unique ID Generator">
+  <h1>Unique ID Generator</h1>
+  <form id="idForm" aria-describedby="instructions">
+    <label for="nameInput">Full Name</label>
+    <input type="text" id="nameInput" placeholder="John Doe" autocomplete="off" required aria-required="true" />
+    
+    <label for="positionInput">Position</label>
+    <input type="text" id="positionInput" placeholder="Software Engineer" autocomplete="off" required aria-required="true" />
+    
+    <label for="dobInput">Date of Birth</label>
+    <input type="date" id="dobInput" required aria-required="true" max="" />
+    <small id="instructions">Format: YYYY-MM-DD</small>
+    
+    <button type="submit" id="generateBtn" aria-label="Generate Unique ID">Generate ID</button>
+  </form>
+  <div class="result" id="result" aria-live="polite" aria-atomic="true" style="display:none;"></div>
+  <button type="button" id="downloadPdfBtn" class="pdf-btn" style="display:none;" aria-label="Download generated ID details as PDF">Download PDF</button>
+  <button type="button" id="showAdminLoginBtn" class="admin-login-btn" aria-label="Go to Admin Login">Admin Login</button>
+</div>
+
+<div class="container" id="admin-container" role="main" aria-label="Admin Panel" tabindex="-1">
+  <div id="admin-login-view" style="display: block;">
+    <h2>Admin Login</h2>
+    <form id="adminLoginForm">
+      <div>
+        <label for="adminUsernameInput">Username</label>
+        <input type="text" id="adminUsernameInput" autocomplete="username" required aria-required="true" />
+      </div>
+      <div>
+        <label for="adminPasswordInput">Password</label>
+        <input type="password" id="adminPasswordInput" autocomplete="current-password" required aria-required="true" />
+      </div>
+      <div class="error-message" id="loginError" role="alert" aria-live="assertive" style="display:none;"></div>
+      <button type="submit" id="adminLoginBtn" aria-label="Login as admin">Login</button>
+      <button type="button" id="backToGeneratorBtn" class="admin-login-btn" aria-label="Back to ID Generator" style="margin-top: 15px; width: 100%; background: #999;">Back to Generator</button>
+    </form>
+  </div>
+  <div id="admin-dashboard-view" style="display:none;">
+    <div class="admin-panel-header">
+      <h2>Generated IDs Dashboard</h2>
+      <button type="button" class="btn-logout" id="logoutBtn" aria-label="Logout from admin panel">Logout</button>
+    </div>
+    <div class="table-wrapper" tabindex="0" aria-label="Generated unique IDs table">
+      <table id="entriesTable" aria-describedby="tableDescription">
+        <thead>
+          <tr>
+            <th scope="col">Timestamp</th>
+            <th scope="col">Name</th>
+            <th scope="col">Position</th>
+            <th scope="col">Date of Birth</th>
+            <th scope="col">Unique ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Entries will be dynamically inserted here -->
+        </tbody>
+      </table>
+      <small id="tableDescription">Table showing all generated user unique IDs with timestamps.</small>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="alert" aria-live="assertive" aria-atomic="true"></div>
+
+<script>
+  // Check EmailJS SDK has loaded
+  if(typeof emailjs === 'undefined') {
+    console.error('EmailJS SDK did not load. Email sending will not work.');
+  } else {
+    // Initialize EmailJS with your EmailJS User ID (replace with your actual ID)
+    emailjs.init('YOUR_EMAILJS_USER_ID'); // <-- Replace this with your EmailJS user ID
+  }
+
+  // Admin credentials (demo mode - hardcoded)
+  const ADMIN_USERNAME = 'admin';
+  const ADMIN_PASSWORD = 'password123';  // Change this before deployment
+
+  // Containers and elements
+  const generatorContainer = document.getElementById('generator-container');
+  const adminContainer = document.getElementById('admin-container');
+  const adminLoginView = document.getElementById('admin-login-view');
+  const adminDashboardView = document.getElementById('admin-dashboard-view');
+  const loginError = document.getElementById('loginError');
+
+  // Generator form elements
+  const form = document.getElementById('idForm');
+  const nameInput = document.getElementById('nameInput');
+  const positionInput = document.getElementById('positionInput');
+  const dobInput = document.getElementById('dobInput');
+  const resultEl = document.getElementById('result');
+  const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+  const showAdminLoginBtn = document.getElementById('showAdminLoginBtn');
+
+  // Admin login form
+  const adminLoginForm = document.getElementById('adminLoginForm');
+  const adminUsernameInput = document.getElementById('adminUsernameInput');
+  const adminPasswordInput = document.getElementById('adminPasswordInput');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const backToGeneratorBtn = document.getElementById('backToGeneratorBtn');
+  const entriesTableBody = document.querySelector('#entriesTable tbody');
+
+  // Toast
+  const toast = document.getElementById('toast');
+  function showToast(message, duration = 3000) {
+    toast.textContent = message;
+    toast.className = "show";
+    setTimeout(() => {
+      toast.className = toast.className.replace("show", "");
+    }, duration);
+  }
+
+  // Store generated entries key for localStorage
+  const STORAGE_KEY = 'uniqueIdGeneratorEntries';
+
+  // Limit DOB max to today
+  dobInput.max = new Date().toISOString().split("T")[0];
+
+  // Utility functions for ID generation
+  function getInitials(name) {
+    if (!name) return '';
+    const words = name.trim().split(/\s+/);
+    if(words.length === 1) {
+      return words[0].charAt(0).toUpperCase();
+    }
+    return (words[0].charAt(0) + words[words.length -1].charAt(0)).toUpperCase();
+  }
+  function getPositionAbbr(position) {
+    if (!position) return '';
+    const cleanPos = position.replace(/[^A-Za-z]/g, '').toUpperCase();
+    return cleanPos.substr(0, 3) || 'XXX';
+  }
+  function formatDOB(dobStr) {
+    if (!dobStr) return '';
+    const parts = dobStr.split('-');
+    if(parts.length !== 3) return '';
+    return parts[0].slice(2) + parts[1] + parts[2];
+  }
+  function generateRandomSuffix(length = 4) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let suffix = '';
+    for(let i=0; i<length; i++) {
+      suffix += chars.charAt(Math.floor(Math.random()*chars.length));
+    }
+    return suffix;
+  }
+  function generateUniqueId(name, position, dob) {
+    return `${getInitials(name)}-${getPositionAbbr(position)}-${formatDOB(dob)}-${generateRandomSuffix()}`;
+  }
+  // Save entry to localStorage
+  function saveEntry(entry) {
+    const entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    entries.push(entry);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }
+  // Load entries from localStorage
+  function loadEntries() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  }
+  // Clear entries in UI
+  function clearEntriesTable() {
+    while(entriesTableBody.firstChild) {
+      entriesTableBody.removeChild(entriesTableBody.firstChild);
+    }
+  }
+  // Render entries table rows
+  function renderEntries() {
+    clearEntriesTable();
+    const entries = loadEntries();
+    if(entries.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 5;
+      td.style.textAlign = 'center';
+      td.style.fontStyle = 'italic';
+      td.textContent = 'No entries generated yet.';
+      tr.appendChild(td);
+      entriesTableBody.appendChild(tr);
+      return;
+    }
+    entries.sort((a, b) => b.timestamp - a.timestamp); // newest first
+    for(const entry of entries) {
+      const tr = document.createElement('tr');
+      // Format timestamp to a readable string
+      const dateObj = new Date(entry.timestamp);
+      const tsStr = dateObj.toLocaleString(undefined, {
+        dateStyle: 'short',
+        timeStyle: 'short',
+      });
+      tr.innerHTML = `
+        <td>${tsStr}</td>
+        <td>${entry.name}</td>
+        <td>${entry.position}</td>
+        <td>${entry.dob}</td>
+        <td>${entry.uniqueId}</td>
+      `;
+      entriesTableBody.appendChild(tr);
+    }
+  }
+
+  // Generator logic state
+  let lastGenerated = null;
+
+  // Fix: Listen to form submit properly (not relying on onsubmit attr)
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    generateIdHandler();
+  });
+
+  function generateIdHandler() {
+    const name = nameInput.value.trim();
+    const position = positionInput.value.trim();
+    const dob = dobInput.value;
+
+    if(!name || !position || !dob) {
+      resultEl.style.display = 'none';
+      downloadPdfBtn.style.display = 'none';
+      return;
+    }
+    const uniqueId = generateUniqueId(name, position, dob);
+    resultEl.textContent = uniqueId;
+    resultEl.style.display = 'block';
+    downloadPdfBtn.style.display = 'block';
+
+    lastGenerated = {
+      name,
+      position,
+      dob,
+      uniqueId,
+      timestamp: Date.now(),
+    };
+
+    // Save entry
+    saveEntry(lastGenerated);
+
+    // Send email
+    sendEmail(name, position, dob, uniqueId).catch(() => {});
+
+    // Notify user
+    showToast('Unique ID generated successfully!');
+  }
+
+  // Download PDF button handler
+  downloadPdfBtn.addEventListener('click', () => {
+    if(!lastGenerated) return;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Professional Unique ID", 105, 25, null, null, "center");
+
+    doc.setDrawColor(74, 124, 247);
+    doc.setLineWidth(0.8);
+    doc.line(20, 30, 190, 30);
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Name: `, 20, 45);
+    doc.setFont("helvetica", "bold");
+    doc.text(lastGenerated.name, 55, 45);
+
+    doc.setFont("helvetica", "normal");
+    doc.text(`Position: `, 20, 55);
+    doc.setFont("helvetica", "bold");
+    doc.text(lastGenerated.position, 55, 55);
+
+    doc.setFont("helvetica", "normal");
+    doc.text(`Date of Birth: `, 20, 65);
+    doc.setFont("helvetica", "bold");
+    doc.text(lastGenerated.dob, 70, 65);
+
+    doc.setFont("helvetica", "normal");
+    doc.text(`Generated Unique ID: `, 20, 80);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(26, 61, 191);
+    doc.text(lastGenerated.uniqueId, 20, 90);
+
+    doc.setTextColor(0,0,0);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "italic");
+    doc.text("Generated by Unique ID Generator System", 105, 280, null, null, "center");
+
+    doc.save(`UniqueID_${lastGenerated.uniqueId}.pdf`);
+  });
+
+  // Email sending function using EmailJS
+  async function sendEmail(name, position, dob, uniqueId) {
+    // Check if emailjs is ready
+    if(typeof emailjs === 'undefined' || !emailjs.send) {
+      console.warn('EmailJS library is not loaded. Cannot send email.');
+      return;
+    }
+    // Replace with your EmailJS details
+    const serviceID = 'YOUR_EMAILJS_SERVICE_ID';
+    const templateID = 'YOUR_EMAILJS_TEMPLATE_ID';
+
+    if(serviceID === 'YOUR_EMAILJS_SERVICE_ID' || templateID === 'YOUR_EMAILJS_TEMPLATE_ID') {
+      console.warn('Please replace EmailJS serviceID and templateID with your actual IDs.');
+      return;
+    }
+
+    const templateParams = {
+      user_name: name,
+      user_position: position,
+      user_dob: dob,
+      user_uniqueId: uniqueId
+    };
+
+    try {
+      await emailjs.send(serviceID, templateID, templateParams);
+      // Email sent successfully
+      // Optionally show toast here
+      // showToast('Notification email sent!');
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      showToast('Failed to send email. Check EmailJS setup.');
+    }
+  }
+
+  // Show admin login from generator UI
+  showAdminLoginBtn.addEventListener('click', () => {
+    generatorContainer.classList.remove('active');
+    adminContainer.classList.add('active');
+    adminLoginView.style.display = 'block';
+    adminDashboardView.style.display = 'none';
+    loginError.style.display = 'none';
+    adminUsernameInput.value = '';
+    adminPasswordInput.value = '';
+    adminUsernameInput.focus();
+  });
+
+  // Back to generator from admin login page
+  backToGeneratorBtn.addEventListener('click', () => {
+    adminContainer.classList.remove('active');
+    generatorContainer.classList.add('active');
+    clearLoginError();
+    nameInput.focus();
+  });
+
+  // Admin login submit handler
+  adminLoginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const inputUser = adminUsernameInput.value.trim();
+    const inputPass = adminPasswordInput.value.trim();
+    if (inputUser === ADMIN_USERNAME && inputPass === ADMIN_PASSWORD) {
+      loginSuccess();
+    } else {
+      showLoginError('Invalid username or password');
+    }
+  });
+
+  // Logout from admin dashboard
+  logoutBtn.addEventListener('click', () => {
+    adminDashboardView.style.display = 'none';
+    adminLoginView.style.display = 'block';
+    adminUsernameInput.value = '';
+    adminPasswordInput.value = '';
+    clearLoginError();
+    adminUsernameInput.focus();
+  });
+
+  function loginSuccess() {
+    loginError.style.display = 'none';
+    adminLoginView.style.display = 'none';
+    adminDashboardView.style.display = 'block';
+    renderEntries();
+    document.querySelector('.table-wrapper').focus();
+  }
+  function showLoginError(msg) {
+    loginError.textContent = msg;
+    loginError.style.display = 'block';
+  }
+  function clearLoginError() {
+    loginError.style.display = 'none';
+    loginError.textContent = '';
+  }
+
+  // Initially show generator UI
+  function initView() {
+    generatorContainer.classList.add('active');
+    adminContainer.classList.remove('active');
+  }
+  initView();
+</script>
+
+</body>
+</html>
+
